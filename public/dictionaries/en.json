@@ -1,0 +1,208 @@
+{
+  "navbar": {
+    "home": "Home",
+    "solutions": "Solutions",
+    "coverage": "Coverage",
+    "partners": "Partners",
+    "contact": "Contact",
+    "get_started": "Get Started",
+    "live": "Live",
+    "logout": "Logout"
+  },
+  "home": {
+    "title": "Welcome to IMS Dashboard",
+    "subtitle": "Your Integrated Management System Dashboard",
+    "description": "Streamline your business operations with our comprehensive management solution.",
+    "get_started": "Get Started",
+    "add_country": "Add New Country"
+  },
+  "hero": {
+    "new_badge": "new",
+    "latest_integration": "Latest integration just arrived",
+    "main_title": "THE GREATEST COMPANY <br /> FOR CLICK2SMS",
+    "subtitle": "THE BEST VERTICALS // THE BEST CONVERSION RATES // MOBILE CONTENT // CPA OFFERS",
+    "partners_text": "partners partners partners partners"
+  },
+  "about": {
+    "title": "About Us",
+    "description": "We provide innovative solutions to help businesses grow and succeed in today's competitive market."
+  },
+  "services": {
+    "title": "Our Services",
+    "description": "Comprehensive management solutions tailored to your business needs."
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "Get in touch with our team for more information.",
+    "phone": {
+      "label": "Phone number",
+      "value": "+1 (800) 123-4567"
+    },
+    "email": {
+      "label": "Email",
+      "value": "IMS@info.com"
+    },
+    "location": {
+      "label": "Headquarters",
+      "value": "London, 2LT W1D, United Kingdom"
+    },
+    "form": {
+      "name": "Name",
+      "country": "Country",
+      "email": "Email",
+      "company": "Company",
+      "traffic_sources": "Traffic Sources",
+      "skype_id": "Skype ID",
+      "message": "How can we help you?",
+      "send_button": "Send Message",
+      "sending": "Sending...",
+      "success_title": "Thank You!",
+      "success_message": "Your message has been sent successfully.",
+      "placeholders": {
+        "name": "Enter your full name",
+        "country": "Enter your country",
+        "email": "Enter your email",
+        "company": "Enter your company",
+        "traffic_sources": "e.g, Facebook, Google, Email",
+        "skype_id": "Enter your skype ID",
+        "message": "Write what you're thinking about"
+      }
+    }
+  },
+  "footer": {
+    "copyright": "© 2025 EmpireSMS. All Rights Reserved",
+    "sections": {
+      "company": "Company",
+      "solutions": "Solutions",
+      "resources": "Resources",
+      "contact": "Contact"
+    },
+    "company_links": {
+      "about_us": "About Us",
+      "partners": "Partners",
+      "contact": "Contact"
+    },
+    "solutions_links": {
+      "click2sms": "Click2SMS",
+      "carrier_billing": "Carrier Billing",
+      "cpi_offers": "CPI Offers"
+    },
+    "resources_links": {
+      "faq": "FAQ",
+      "privacy_policy": "Privacy Policy",
+      "terms_conditions": "Terms & Conditions"
+    },
+    "contact_info": {
+      "address": "Beirut Digital District, Block B Beirut, Lebanon",
+      "phone": "+1 (000) 123 4567",
+      "email": "support@empiresms.com"
+    }
+  },
+  "stats": {
+    "daily_leads": {
+      "number": "+50.000",
+      "title": "DAILY LEADS",
+      "description": "Verified and engaged users every single day"
+    },
+    "connected_geos": {
+      "number": "+190",
+      "title": "CONNECTED GEOS",
+      "description": "Expanding campaigns across worldwide"
+    },
+    "delivery_rate": {
+      "number": "99.9%",
+      "title": "DELIVERY RATE",
+      "description": "Reliable infrastructure ensuring secure delivery"
+    }
+  },
+  "whatWeOffer": {
+    "title": "WHAT WE OFFER?",
+    "subtitle": "We are Advertisers focused on development and distribution of mobile content offers. +15 years of experience, professionalism and recognition in the industry",
+    "offers": {
+      "exclusive_in_house": {
+        "title": "EXCLUSIVE IN-HOUSE OFFERS",
+        "description": "100% IN-HOUSE - Discover our exclusive contents, premium technologies and services."
+      },
+      "network": {
+        "title": "NETWORK",
+        "description": "Monitor our digital product portfolio with our requirements, live & easy."
+      },
+      "best_converting": {
+        "title": "BEST CONVERTING OFFERS",
+        "description": "Find the best conversion rates and offers. We have suitable campaigns that fit all verticals."
+      }
+    }
+  },
+  "features": {
+    "click2sms": {
+      "category": "Payment",
+      "title": "CLICK2SMS",
+      "description": "Find the best conversion rates and verticals - All kind of traffic allowed - Live in more than 70 countries!",
+      "features": [
+        "Worldwide coverage",
+        "Best ECPM on CLICK2SMS",
+        "More than 100 Offers",
+        "Personalized landing pages"
+      ]
+    },
+    "carrier_billing": {
+      "category": "Payment",
+      "title": "CARRIER BILLING",
+      "description": "Take advantage of every visit. Make the most of it through our retargeting techniques finding the best carrier, device, model, OS...",
+      "features": [
+        "More than 20 countries",
+        "Best flows",
+        "Clickflow / PIN submit"
+      ]
+    },
+    "cpi_offers": {
+      "category": "Payment",
+      "title": "CPI OFFERS",
+      "description": "Are you looking for a special CPI offer? — Our CPI offers have the best ECP's available.",
+      "features": [
+        "Worldwide coverage",
+        "Best ECPM",
+        "Personalized landing pages"
+      ]
+    }
+  },
+  "numbers": {
+    "live_countries": {
+      "number": "+150",
+      "label": "Live Countries"
+    },
+    "leads_daily": {
+      "number": "+75.000",
+      "label": "Leads Daily"
+    },
+    "conversions_daily": {
+      "number": "+65.000",
+      "label": "Conversions Daily"
+    },
+    "live_carriers": {
+      "number": "+450",
+      "label": "Live Carriers"
+    }
+  },
+  "worldwide": {
+    "title": "WORLDWIDE COVERAGE",
+    "description": "We are Advertisers focused on development and distribution of mobile content offers. +15 years of experience, professionalism and recognition in the industry"
+  },
+  "login": {
+    "title": "Sign In",
+    "subtitle": "Welcome back! Please sign in to your account",
+    "username": "Username",
+    "password": "Password",
+    "sign_in": "Sign In",
+    "forgot_password": "Forgot Password?",
+    "remember_me": "Remember me",
+    "placeholders": {
+      "username": "Enter your username",
+      "password": "Enter your password"
+    },
+    "errors": {
+      "required": "This field is required",
+      "invalid_credentials": "Invalid username or password"
+    }
+  }
+}
