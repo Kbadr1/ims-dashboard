@@ -104,7 +104,7 @@ export function CountriesTable({ dict, params }: CountriesTableProps) {
                 Country (AR)
               </th>
               <th className="border border-gray-300 px-4 py-3 text-left text-sm font-medium text-gray-700">
-                Price
+                Providers
               </th>
               <th className="border border-gray-300 px-4 py-3 text-left text-sm font-medium text-gray-700">
                 Companies
@@ -136,7 +136,9 @@ export function CountriesTable({ dict, params }: CountriesTableProps) {
                   {country.country_ar}
                 </td>
                 <td className="border border-gray-300 px-4 py-3 text-sm text-gray-900">
-                  ${country.price}
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#7d287e33] text-[#7d287e]">
+                    {country.providers.length}
+                  </span>
                 </td>
                 <td className="border border-gray-300 px-4 py-3 text-sm text-gray-900">
                   <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#7d287e33] text-[#7d287e]">

@@ -1,6 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { httpClient } from "@/services/http.service";
 
+interface Provider {
+  name: string;
+  price: number;
+  companies: { name: string }[];
+}
+
 interface Country {
   flag: string;
   country: string;
@@ -14,6 +20,7 @@ interface Country {
     createdAt: string;
     updatedAt: string;
   }>;
+  providers: Provider[];
   createdAt: string;
   updatedAt: string;
 }
@@ -26,10 +33,8 @@ interface CountriesResponse {
 
 interface AddCompanyRequest {
   countryCode: string;
-  price: number;
-  companyName: string;
+  providers: Provider[];
   token: string;
-  companies?: { name: string }[];
 }
 
 interface AddCompanyResponse {
@@ -94,15 +99,12 @@ export function useAddCompany() {
 
   return useMutation({
     mutationFn: async (payload: AddCompanyRequest): Promise<AddCompanyResponse> => {
-      const { countryCode, price, companyName, companies } = payload;
-      // If companies array is provided, use it; otherwise use single company
-      const companiesToSend = companies || [{ name: companyName.trim() }];
+      const { countryCode, providers } = payload;
       
       const response = await httpClient.patch(
         `countries/${countryCode}`,
         {
-          price: price,
-          companies: companiesToSend,
+          providers: providers,
         }
       );
       return response.data;
@@ -123,8 +125,7 @@ export function useDeleteCountry() {
     mutationFn: async (payload: { countryCode: string; token: string }) => {
       const { countryCode } = payload;
       const response = await httpClient.patch(`countries/${countryCode}`, {
-        price: 0,
-        companies: [],
+        providers: []
       });
       return response.data;
     },

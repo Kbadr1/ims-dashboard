@@ -36,14 +36,20 @@ interface EditCountryDialogProps {
       createdAt: string;
       updatedAt: string;
     }>;
+    providers: Provider[];
   };
   onSuccess?: (message: string) => void;
 }
 
 interface FormData {
+  providers: Provider[];
+  countryCode: string;
+}
+
+interface Provider {
+  name: string;
   price: number;
   companies: { name: string }[];
-  countryCode: string;
 }
 
 interface CompanyToManage {
@@ -60,10 +66,15 @@ export function EditCountryDialog({
 }: EditCountryDialogProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [companyName, setCompanyName] = useState("");
-  const [price, setPrice] = useState(country.price);
+  const [providerName, setProviderName] = useState("");
+  const [providerPrice, setProviderPrice] = useState(0);
   const [companiesToManage, setCompaniesToManage] = useState<CompanyToManage[]>(
     []
   );
+  const [providers, setProviders] = useState<Provider[]>([]);
+  const [currentProviderIndex, setCurrentProviderIndex] = useState<
+    number | null
+  >(null);
 
   const { token } = useAuthStore();
   const queryClient = useQueryClient();
@@ -79,18 +90,12 @@ export function EditCountryDialog({
   useEffect(() => {
     if (isDialogOpen) {
       console.log("EditCountryDialog - Country data:", country);
-      console.log("EditCountryDialog - Companies:", country.companies);
+      console.log("EditCountryDialog - Providers:", country.providers);
       setValue("countryCode", country.code);
-      setPrice(country.price);
-      // Initialize companies to manage with existing companies
-      setCompaniesToManage(
-        country.companies.map((company) => ({
-          id: company.id,
-          name: company.name,
-          isNew: false,
-          isRemoved: false,
-        }))
-      );
+      // Initialize providers with existing providers
+      setProviders(country.providers || []);
+      setCompaniesToManage([]);
+      setCurrentProviderIndex(null);
     }
   }, [isDialogOpen, country, setValue]);
 
@@ -108,49 +113,93 @@ export function EditCountryDialog({
   };
 
   const removeCompanyFromList = (index: number) => {
-    const company = companiesToManage[index];
-    if (company.isNew) {
-      // If it's a new company, just remove it from the list
-      setCompaniesToManage((prev) => prev.filter((_, i) => i !== index));
-    } else {
-      // If it's an existing company, mark it as removed
-      setCompaniesToManage((prev) =>
-        prev.map((comp, i) =>
-          i === index ? { ...comp, isRemoved: true } : comp
-        )
-      );
-    }
+    setCompaniesToManage((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const addProviderToList = () => {
+    if (
+      !providerName.trim() ||
+      providerPrice <= 0 ||
+      companiesToManage.length === 0
+    )
+      return;
+
+    const newProvider: Provider = {
+      name: providerName.trim(),
+      price: providerPrice,
+      companies: companiesToManage.map((comp) => ({ name: comp.name })),
+    };
+
+    setProviders((prev) => [...prev, newProvider]);
+    setProviderName("");
+    setProviderPrice(0);
+    setCompaniesToManage([]);
+    setCurrentProviderIndex(null);
+  };
+
+  const removeProviderFromList = (index: number) => {
+    setProviders((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const editProvider = (index: number) => {
+    const provider = providers[index];
+    setProviderName(provider.name);
+    setProviderPrice(provider.price);
+    setCompaniesToManage(
+      provider.companies.map((comp) => ({
+        name: comp.name,
+        isNew: false,
+        isRemoved: false,
+      }))
+    );
+    setCurrentProviderIndex(index);
+  };
+
+  const updateProvider = () => {
+    if (
+      !providerName.trim() ||
+      providerPrice <= 0 ||
+      companiesToManage.length === 0 ||
+      currentProviderIndex === null
+    )
+      return;
+
+    const updatedProvider: Provider = {
+      name: providerName.trim(),
+      price: providerPrice,
+      companies: companiesToManage.map((comp) => ({ name: comp.name })),
+    };
+
+    setProviders((prev) =>
+      prev.map((provider, i) =>
+        i === currentProviderIndex ? updatedProvider : provider
+      )
+    );
+    setProviderName("");
+    setProviderPrice(0);
+    setCompaniesToManage([]);
+    setCurrentProviderIndex(null);
   };
 
   const submitAllChanges = async () => {
-    if (!selectedCountryCode || price <= 0) return;
-
-    // Get all active companies (both existing and new)
-    const allActiveCompanies = companiesToManage
-      .filter((comp) => !comp.isRemoved)
-      .map((comp) => ({ name: comp.name }));
-
-    if (allActiveCompanies.length === 0) {
-      // If no companies, just show a message
-      onSuccess?.("No companies to submit");
-      setIsDialogOpen(false);
-      return;
-    }
+    if (!selectedCountryCode || providers.length === 0) return;
 
     addCompanyMutation.mutate(
       {
         countryCode: selectedCountryCode,
-        price: price,
-        companyName: "",
+        providers: providers,
         token: token || "",
-        companies: allActiveCompanies,
       },
       {
         onSuccess: (result) => {
           if (result.success) {
-            const message = `${allActiveCompanies.length} companies updated successfully!`;
+            const totalCompanies = providers.reduce(
+              (sum, provider) => sum + provider.companies.length,
+              0
+            );
+            const message = `${providers.length} providers with ${totalCompanies} companies updated successfully!`;
             onSuccess?.(message);
-            console.log("Companies updated successfully:", result.data);
+            console.log("Providers updated successfully:", result.data);
 
             // Invalidate queries to refresh data
             queryClient.invalidateQueries({ queryKey: ["countries"] });
@@ -159,18 +208,21 @@ export function EditCountryDialog({
             });
 
             // Clear everything and close dialog
+            setProviders([]);
             setCompaniesToManage([]);
             setCompanyName("");
-            setPrice(country.price);
+            setProviderName("");
+            setProviderPrice(0);
+            setCurrentProviderIndex(null);
             setIsDialogOpen(false);
             reset();
             addCompanyMutation.reset();
           } else {
-            console.error("Error updating companies:", result.error);
+            console.error("Error updating providers:", result.error);
           }
         },
         onError: (error) => {
-          console.error("Error adding companies:", error);
+          console.error("Error updating providers:", error);
         },
       }
     );
@@ -182,18 +234,17 @@ export function EditCountryDialog({
       // Reset form when dialog closes
       reset();
       setCompanyName("");
-      setPrice(country.price);
+      setProviderName("");
+      setProviderPrice(0);
       setCompaniesToManage([]);
+      setProviders([]);
+      setCurrentProviderIndex(null);
       addCompanyMutation.reset();
     }
   };
 
-  // Filter companies for display
-  const activeCompanies = companiesToManage.filter((comp) => !comp.isRemoved);
-  const hasChanges =
-    activeCompanies.length !== country.companies.length ||
-    price !== country.price ||
-    companiesToManage.some((comp) => comp.isNew);
+  // Check if there are changes
+  const hasChanges = providers.length > 0;
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>
@@ -204,9 +255,9 @@ export function EditCountryDialog({
       </DialogTrigger>
       <DialogContent className="sm:max-w-md overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Edit Country - {country.country}</DialogTitle>
+          <DialogTitle>Edit Providers - {country.country}</DialogTitle>
           <DialogDescription>
-            Manage companies for {country.country} and update the price.
+            Manage providers and their companies for {country.country}.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(() => {})} className="space-y-4">
@@ -241,33 +292,43 @@ export function EditCountryDialog({
             ) : null}
           </div>
 
-          {/* Price Input */}
-          <div>
-            <Label htmlFor="price" className="text-sm font-medium">
-              Price * (Current: ${country.price})
-            </Label>
-            <Input
-              id="price"
-              type="number"
-              placeholder="Enter new price"
-              value={price}
-              onChange={(e) => setPrice(Number(e.target.value))}
-              className="mt-1"
-              min="0"
-              step="0.01"
-              required
-            />
-            {price <= 0 && (
-              <p className="text-red-500 text-sm mt-1">
-                Price is required and must be greater than 0
-              </p>
-            )}
+          {/* Provider Name and Price */}
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <Label htmlFor="provider-name" className="text-sm font-medium">
+                Provider Name *
+              </Label>
+              <Input
+                id="provider-name"
+                placeholder="Enter provider name"
+                value={providerName}
+                onChange={(e) => setProviderName(e.target.value)}
+                className="mt-1"
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="provider-price" className="text-sm font-medium">
+                Provider Price *
+              </Label>
+              <Input
+                id="provider-price"
+                type="number"
+                placeholder="Enter price"
+                value={providerPrice}
+                onChange={(e) => setProviderPrice(Number(e.target.value))}
+                className="mt-1"
+                min="0"
+                step="0.01"
+                required
+              />
+            </div>
           </div>
 
-          {/* Add New Companies */}
+          {/* Add Companies to Current Provider */}
           <div>
             <Label htmlFor="company-name" className="text-sm font-medium">
-              Add New Companies
+              Add Companies to Current Provider
             </Label>
             <div className="flex gap-2 mt-1">
               <Input
@@ -285,7 +346,7 @@ export function EditCountryDialog({
               <Button
                 type="button"
                 onClick={addCompanyToList}
-                disabled={!companyName.trim() || price <= 0}
+                disabled={!companyName.trim()}
                 className="bg-[#7d287e] hover:bg-[#6a1f6b] text-white px-4"
               >
                 <Plus className="w-4 h-4" />
@@ -293,38 +354,21 @@ export function EditCountryDialog({
             </div>
           </div>
 
-          {/* Companies List */}
-          {activeCompanies.length > 0 && (
+          {/* Companies List for Current Provider */}
+          {companiesToManage.length > 0 && (
             <div className="mt-6">
               <h3 className="text-sm font-medium mb-3">
-                Companies ({activeCompanies.length}) - Price: ${price}
+                Companies for {providerName || "Current Provider"} (
+                {companiesToManage.length})
               </h3>
               <div className="space-y-2 max-h-40 overflow-y-auto">
-                {activeCompanies.map((company, index) => (
+                {companiesToManage.map((company, index) => (
                   <div
-                    key={company.id || index}
-                    className="flex items-center justify-between p-3 rounded-md border bg-blue-50 border-blue-200"
+                    key={index}
+                    className="flex items-center justify-between p-3 bg-gray-50 rounded-md border"
                   >
                     <div className="flex-1">
-                      {company.isNew ? (
-                        <div>
-                          <div className="font-medium text-sm">
-                            {company.name}
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {company.id ? "Existing" : "New"}
-                          </div>
-                        </div>
-                      ) : (
-                        <div>
-                          <div className="font-medium text-sm">
-                            {company.name}
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {company.id ? "Existing" : "New"}
-                          </div>
-                        </div>
-                      )}
+                      <div className="font-medium text-sm">{company.name}</div>
                     </div>
                     <Button
                       type="button"
@@ -335,6 +379,92 @@ export function EditCountryDialog({
                     >
                       <X className="w-4 h-4" />
                     </Button>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-3 flex gap-2">
+                {currentProviderIndex === null ? (
+                  <Button
+                    type="button"
+                    onClick={addProviderToList}
+                    disabled={
+                      !providerName.trim() ||
+                      providerPrice <= 0 ||
+                      companiesToManage.length === 0
+                    }
+                    className="flex-1 bg-[#6A1F6B] hover:bg-[#6a1f6bdc] text-white"
+                  >
+                    Add Provider to List
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    onClick={updateProvider}
+                    disabled={
+                      !providerName.trim() ||
+                      providerPrice <= 0 ||
+                      companiesToManage.length === 0
+                    }
+                    className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    Update Provider
+                  </Button>
+                )}
+                <Button
+                  type="button"
+                  onClick={() => {
+                    setProviderName("");
+                    setProviderPrice(0);
+                    setCompaniesToManage([]);
+                    setCurrentProviderIndex(null);
+                  }}
+                  className="bg-gray-500 hover:bg-gray-600 text-white"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Providers List */}
+          {providers.length > 0 && (
+            <div className="mt-6">
+              <h3 className="text-sm font-medium mb-3">
+                Providers ({providers.length})
+              </h3>
+              <div className="space-y-2 max-h-40 overflow-y-auto">
+                {providers.map((provider, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-3 bg-[#6a1f6b18] rounded-md border border-[#6a1f6b2f]"
+                  >
+                    <div className="flex-1">
+                      <div className="font-medium text-sm">{provider.name}</div>
+                      <div className="text-xs text-gray-600">
+                        ${provider.price} - {provider.companies.length}{" "}
+                        companies
+                      </div>
+                    </div>
+                    <div className="flex gap-1">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => editProvider(index)}
+                        className="text-[#6A1F6B] hover:text-[#6A1F6B] hover:bg-[#6a1f6b31] p-1 h-auto"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeProviderFromList(index)}
+                        className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1 h-auto"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -353,10 +483,10 @@ export function EditCountryDialog({
                 {addCompanyMutation.isPending ? (
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Updating {activeCompanies.length} companies...
+                    Updating {providers.length} providers...
                   </div>
                 ) : (
-                  `Submit Changes (${activeCompanies.length} companies)`
+                  `Submit Changes (${providers.length} providers)`
                 )}
               </Button>
             </div>
