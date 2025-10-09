@@ -1,11 +1,18 @@
-  
 import { useAuthStore } from "@/auth.store";
 import axios from "axios";
 
+// export const httpClient = axios.create({
+//   baseURL: "http://localhost:3000/api",
+//   headers: {
+//     "Authorization": "",
+//     "Content-Type": "application/json",
+//   },
+// });
+
 export const httpClient = axios.create({
-  baseURL: "http://localhost:3000/api",
+  baseURL: "https://ims-sms.com/api",
   headers: {
-    "Authorization": "",
+    Authorization: "",
     "Content-Type": "application/json",
   },
 });

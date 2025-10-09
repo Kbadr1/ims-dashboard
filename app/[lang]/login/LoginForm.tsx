@@ -40,8 +40,15 @@ export default function LoginForm({ dict, lang }: LoginFormProps) {
     setApiError(""); // Clear previous errors
 
     try {
+      // const response = await axios.post(
+      //   "http://localhost:3000/api/auth/login",
+      //   {
+      //     username: data.username,
+      //     password: data.password,
+      //   }
+      // );
       const response = await axios.post(
-        "http://localhost:3000/api/auth/login",
+        "https://ims-sms.com/api/auth/login",
         {
           username: data.username,
           password: data.password,
